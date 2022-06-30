@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "603863995557",
+    "project_id": "chatchitapp-a3b67",
+    "storage_bucket": "chatchitapp-a3b67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:603863995557:android:13ed80d180de64b1d2e94c",
+        "android_client_info": {
+          "package_name": "com.example.chatchit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "603863995557-amf4v40l1q5c71pcqun3d3lkspkl2l2p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzMIC6R_d7UCZptkMOdtw31lGHF6wRd74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "603863995557-amf4v40l1q5c71pcqun3d3lkspkl2l2p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
