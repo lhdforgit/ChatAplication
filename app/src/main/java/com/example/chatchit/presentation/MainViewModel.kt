@@ -2,6 +2,7 @@ package com.example.chatchit.presentation
 
 import androidx.lifecycle.*
 import com.example.chatchit.data.repository.message.ChatMessageRepository
+import com.example.chatchit.data.roomdb.entity.MessageEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -9,11 +10,4 @@ import javax.inject.Inject
 class MainViewModel
 @Inject constructor(private val repository: ChatMessageRepository) : ViewModel(){
 
-   suspend fun getMessage(roomId: String): LiveData<String> {
-       return repository.getMessage(roomId)
-   }
-
-    suspend fun sendMessage(message: String, roomId: String) {
-        repository.sendMessage(message, roomId)
-    }
 }

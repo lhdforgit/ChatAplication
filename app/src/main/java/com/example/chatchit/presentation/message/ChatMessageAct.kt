@@ -11,6 +11,7 @@ import com.example.chatchit.R
 import com.example.chatchit.base.AbsActivity
 import com.example.chatchit.common.notNull
 import com.example.chatchit.data.roomdb.entity.MessageEntity
+import com.example.chatchit.data.roomdb.entity.MessageUtil
 import com.example.chatchit.databinding.ChatMessageActBinding
 import com.example.chatchit.presentation.message.adapter.ChatMessageAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +37,8 @@ class ChatMessageAct : AbsActivity() {
 
     override fun initializeLayout() {
         adapter = ChatMessageAdapter()
-        binding.messageRec.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.messageRec.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
         binding.messageRec.setHasFixedSize(true)
         binding.messageRec.adapter = adapter
 
@@ -48,7 +50,8 @@ class ChatMessageAct : AbsActivity() {
         binding.sendMessageBtn.setOnClickListener {
             binding.inputMessageEdt.text?.toString()?.let { msg ->
                 lifecycleScope.launch {
-                    viewModel.sendMessage(msg, roomId)
+                    val messageEntity = MessageUtil.createMessage(msg)
+                    viewModel.sendMessage(messageEntity, roomId)
                     binding.inputMessageEdt.setText("")
                 }
             }
@@ -58,14 +61,15 @@ class ChatMessageAct : AbsActivity() {
     private fun initObserver() {
 
         lifecycleScope.launchWhenStarted {
-            viewModel.getMessageList().observe(this@ChatMessageAct){
+            viewModel.getMessageList().observe(this@ChatMessageAct) {
                 adapter?.setMessage(it)
             }
 
             viewModel.getMessage(roomId).observe(this@ChatMessageAct) {
-                val msg = MessageEntity(it)
                 lifecycleScope.launch {
-                    viewModel.insertMessage(msg)
+                    it?.let { messageEntity ->
+                        viewModel.insertMessage(messageEntity)
+                    }
                 }
             }
         }

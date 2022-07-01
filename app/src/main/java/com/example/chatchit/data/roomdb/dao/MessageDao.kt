@@ -7,7 +7,7 @@ import com.example.chatchit.data.roomdb.entity.MessageEntity
 
 @Dao
 interface MessageDao {
-    @Query("SELECT * FROM message_tb")
+    @Query("SELECT * FROM message_tb ORDER by time DESC")
     fun getMessageList(): LiveData<List<MessageEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -17,13 +17,13 @@ class ChatMessageRepositoryImpl @Inject constructor(
     private val dao: MessageDao
 ) : ChatMessageRepository {
 
-    override suspend fun getMessage(roomId: String): LiveData<String> {
+    override suspend fun getMessage(roomId: String): LiveData<MessageEntity> {
         node.messageNode(roomId).let { query ->
-            return FirebaseQueryLiveData(query)
+            return FirebaseQueryLiveData(query, MessageEntity::class.java)
         }
     }
 
-    override suspend fun sendMessage(message: String, roomId: String) {
+    override suspend fun sendMessage(message: MessageEntity, roomId: String) {
         node.messageNode(roomId).ref.setValue(message)
             .addOnSuccessListener {
 

@@ -12,11 +12,11 @@ import javax.inject.Inject
 class ChatMessageViewModel @Inject constructor(private val repository: ChatMessageRepository) :
     ViewModel() {
 
-    suspend fun getMessage(roomId: String): LiveData<String> {
+    suspend fun getMessage(roomId: String): LiveData<MessageEntity> {
         return repository.getMessage(roomId)
     }
 
-    suspend fun sendMessage(message: String, roomId: String) {
+    suspend fun sendMessage(message: MessageEntity, roomId: String) {
         repository.sendMessage(message, roomId)
     }
 
