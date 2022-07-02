@@ -7,20 +7,23 @@ import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.chatchit.R
 import com.example.chatchit.base.AbsActivity
+import com.example.chatchit.common.NodeConstant
 import com.example.chatchit.common.notNull
 import com.example.chatchit.data.roomdb.entity.MessageEntity
 import com.example.chatchit.data.roomdb.entity.MessageUtil
 import com.example.chatchit.databinding.ChatMessageActBinding
 import com.example.chatchit.presentation.message.adapter.ChatMessageAdapter
+import com.example.chatchit.presentation.message.adapter.ChatMessageDiffCallback
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ChatMessageAct : AbsActivity() {
-    private val roomId = "0813754950-0934497483"
 
     private var binding by notNull<ChatMessageActBinding>()
     private val viewModel: ChatMessageViewModel by viewModels()
@@ -36,14 +39,29 @@ class ChatMessageAct : AbsActivity() {
     }
 
     override fun initializeLayout() {
-        adapter = ChatMessageAdapter()
+        val diffCallback = ChatMessageDiffCallback()
+        adapter = ChatMessageAdapter(diffCallback, Glide.with(this))
         binding.messageRec.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
         binding.messageRec.setHasFixedSize(true)
         binding.messageRec.adapter = adapter
 
-        initObserver()
+
         initActionView()
+        initInsertMessage()
+        initObserver()
+    }
+
+    private fun initInsertMessage() {
+        lifecycleScope.launch {
+            viewModel.getMessage(NodeConstant.roomId).observe(this@ChatMessageAct) {
+                lifecycleScope.launch {
+                    it?.let { messageEntity ->
+                        viewModel.insertMessage(messageEntity)
+                    }
+                }
+            }
+        }
     }
 
     private fun initActionView() {
@@ -51,7 +69,7 @@ class ChatMessageAct : AbsActivity() {
             binding.inputMessageEdt.text?.toString()?.let { msg ->
                 lifecycleScope.launch {
                     val messageEntity = MessageUtil.createMessage(msg)
-                    viewModel.sendMessage(messageEntity, roomId)
+                    viewModel.sendMessage(messageEntity, NodeConstant.roomId)
                     binding.inputMessageEdt.setText("")
                 }
             }
@@ -59,18 +77,9 @@ class ChatMessageAct : AbsActivity() {
     }
 
     private fun initObserver() {
-
-        lifecycleScope.launchWhenStarted {
-            viewModel.getMessageList().observe(this@ChatMessageAct) {
-                adapter?.setMessage(it)
-            }
-
-            viewModel.getMessage(roomId).observe(this@ChatMessageAct) {
-                lifecycleScope.launch {
-                    it?.let { messageEntity ->
-                        viewModel.insertMessage(messageEntity)
-                    }
-                }
+        lifecycleScope.launch {
+            viewModel.getMessagePaging(NodeConstant.roomId).collectLatest {
+                adapter?.submitData(it)
             }
         }
     }

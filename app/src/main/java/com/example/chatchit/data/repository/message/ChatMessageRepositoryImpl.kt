@@ -1,6 +1,10 @@
 package com.example.chatchit.data.repository.message
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.chatchit.common.FirebaseQueryLiveData
 import com.example.chatchit.data.api.message.ChatMessageNode
 import com.example.chatchit.data.roomdb.dao.MessageDao
@@ -38,9 +42,16 @@ class ChatMessageRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertMessage(message: MessageEntity) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             dao.insertMessage(message)
         }
     }
+
+    override suspend fun getMessagePageList(roomId: String): Flow<PagingData<MessageEntity>> =
+        Pager(PagingConfig(pageSize = 20,
+            enablePlaceholders = false,
+            initialLoadSize = 20)) {
+            dao.getMessagePaging(roomId)
+        }.flow
 
 }
